@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FORJA | Entrenamiento personal</title>
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="favicon.png">
+<style>
+:root{--bg:#fff;--soft:#f3f4f6;--ink:#111;--mut:#6b7280;--line:#e3e5e8;--ac:#60a5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 "Helvetica Neue",Arial,sans-serif}
+.nav{position:sticky;top:0;z-index:5;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 20px;flex-wrap:wrap}
+.logo{font-weight:900;font-size:20px;letter-spacing:-.02em;padding:14px 0}
+.nav nav{display:flex;gap:4px}
+.nav nav button{background:none;border:0;border-bottom:3px solid transparent;font:inherit;font-weight:600;padding:16px 12px 13px;cursor:pointer;color:var(--mut)}
+.nav nav button.on{color:var(--ink);border-color:var(--ink)}
+main{max-width:960px;margin:0 auto;padding:20px 16px 40px}
+.pg{display:none}.pg.on{display:block}
+h2{font-size:clamp(26px,5vw,38px);font-weight:900;letter-spacing:-.03em;text-transform:uppercase;margin:8px 0 16px;line-height:1}
+.mut{color:var(--mut);font-size:13px}
+.cover{width:100%;height:auto;display:block}
+.cover+.cap,.pills{margin-top:12px}
+h1.fb{font:900 clamp(48px,12vw,96px)/1 Arial,sans-serif;margin:0;letter-spacing:-.03em;text-transform:uppercase}
+.pills{display:flex;gap:8px;flex-wrap:wrap}
+.pill{border:1px solid var(--line);background:#fff;font:inherit;font-weight:600;padding:8px 16px;cursor:pointer;border-radius:999px}
+.pill.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.pill.ok::after{content:" ✓";color:var(--ac)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin:18px 0}
+.stats div{background:#fff;padding:14px;text-align:center}
+.stats b{display:block;font-size:30px;font-weight:900;letter-spacing:-.03em;line-height:1.1}
+details{border-top:1px solid var(--line)}details:last-of-type{border-bottom:1px solid var(--line)}
+summary{list-style:none;cursor:pointer;padding:14px 4px;display:flex;justify-content:space-between;align-items:center;gap:10px;font-weight:700}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";font-size:22px;font-weight:400;color:var(--mut)}
+details[open]>summary::after{content:"–"}
+summary small{font-weight:400;color:var(--mut);display:block;font-size:13px}
+.sum{flex:1}.chk{color:var(--ac);font-weight:900}
+.body{padding:0 4px 16px}
+.sets{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+.set{display:flex;align-items:center;gap:6px;background:var(--soft);padding:6px 10px}
+.set b{color:var(--mut);font-size:12px}
+input[type=number]{width:58px;background:transparent;border:0;border-bottom:2px solid #cfd3d8;font:inherit;padding:3px;text-align:center;color:var(--ink)}
+input:focus{outline:0;border-color:var(--ink)}
+button:focus-visible,select:focus-visible,summary:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.btn{background:var(--ink);color:#fff;border:2px solid var(--ink);font:inherit;font-weight:700;padding:12px 26px;cursor:pointer;text-transform:uppercase;letter-spacing:.04em}
+.btn:hover{background:#fff;color:var(--ink)}
+.btn.o{background:#fff;color:var(--ink)}.btn.o:hover{background:var(--ink);color:#fff}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:16px;flex-wrap:wrap}
+.li{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}
+.li:last-child{border:0}
+select{border:1px solid var(--ink);background:#fff;padding:10px;font:inherit;max-width:100%}
+svg{width:100%;height:auto;margin-top:12px;background:var(--soft)}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cdh{text-align:center;font-size:12px}
+.cd{min-height:58px;border:0;padding:6px 2px;font:inherit;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;overflow:hidden}
+.cd b{font-size:15px}.cd span{font-size:10px;line-height:1.1}
+button.cd{cursor:pointer}
+.cd.w{background:#fafafa;color:#9ca3af}
+.hoyc{outline:2px solid var(--ink);outline-offset:-2px}
+.s-pendiente{background:#e5e7eb;color:#374151}.s-curso{background:#3b82f6;color:#fff}.s-completado{background:#22c55e;color:#fff}.s-omitida{background:#f97316;color:#fff}
+.legend{display:flex;gap:14px;flex-wrap:wrap;margin:14px 0;font-size:13px}
+.legend i{display:inline-block;width:12px;height:12px;margin-right:6px;vertical-align:-1px}
+button:disabled{opacity:.3;cursor:default}
+#intro{position:fixed;inset:0;z-index:20;isolation:isolate;background:#05070a;color:#fff;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:minmax(0,1fr);align-items:center;justify-items:center;gap:clamp(24px,5vw,80px);padding:4vh 6vw 9vh;transition:opacity .6s,transform .6s}
+#intro .foto{max-width:100%;max-height:100%;min-height:0;object-fit:contain;border-radius:6px;box-shadow:0 30px 80px rgba(0,0,0,.65)}
+#intro .txt{text-align:left;max-width:520px}
+#introHoy{color:#b6bcc8}#introHoy:empty{display:none}
+@media (max-width:760px){#intro{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) auto;padding:3vh 6vw 8vh;gap:22px}#intro .txt{text-align:center}}
+#intro::before{content:"";position:absolute;inset:0;z-index:-2;background:url(portada.jpg) center/cover;filter:blur(30px) brightness(.45);transform:scale(1.15)}
+.pie{position:absolute;bottom:16px;left:0;right:0;font-size:12px;letter-spacing:.12em;color:#8b93a1}
+#intro .lema{font-size:clamp(19px,2.4vw,26px);font-weight:700;line-height:1.3;margin:0 0 14px}
+#intro.out{opacity:0;transform:scale(1.04);pointer-events:none}
+#intro h1{font:900 clamp(56px,16vw,150px)/.9 Arial,sans-serif;letter-spacing:-.04em;margin:0 0 12px}
+#intro p{margin:4px 0;font-size:17px}
+#intro .btn{position:relative;isolation:isolate;overflow:hidden;background:#fff;color:#111;border:2px solid #fff;margin-top:26px;padding:15px 52px;letter-spacing:.16em;cursor:pointer;transition:transform .2s,color .3s;animation:pulso 2.2s infinite}
+#intro .btn::before{content:"";position:absolute;inset:0;background:#111;transform:translateX(-101%);transition:transform .3s;z-index:-1}
+#intro .btn .ar{display:inline-block;transition:transform .25s}
+#intro .btn:hover,#intro .btn:focus-visible{color:#fff;transform:translateY(-2px) scale(1.04);animation:none;box-shadow:0 8px 30px rgba(255,255,255,.25)}
+#intro .btn:hover::before,#intro .btn:focus-visible::before{transform:translateX(0)}
+#intro .btn:hover .ar,#intro .btn:focus-visible .ar{transform:translateX(6px)}
+#intro .btn:active{transform:scale(.96)}
+@keyframes pulso{0%{box-shadow:0 0 0 0 rgba(255,255,255,.5)}100%{box-shadow:0 0 0 18px rgba(255,255,255,0)}}
+@media (prefers-reduced-motion:reduce){#intro .btn{animation:none}#intro,#intro .btn,#intro .btn::before,#intro .btn .ar{transition:none}}
+.cd.sel{box-shadow:inset 0 0 0 3px var(--ink)}
+.dpanel{margin-top:14px;border:1px solid var(--ink);padding:14px 16px}
+.opts{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.opt{border:3px solid transparent;padding:8px 14px;font:inherit;font-weight:700;cursor:pointer}
+.opt.on{border-color:var(--ink)}
+.btn,.pill,.opt,.nav nav button,#timer button,button.cd,.top{transition:transform .18s,box-shadow .18s,background .18s,color .18s,border-color .18s}
+.btn:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.2)}
+.btn:active,.pill:active,.opt:active,#timer button:active,button.cd:active{transform:scale(.96)}
+.pill:hover{border-color:var(--ink);transform:translateY(-2px)}
+.nav nav button:not(.on):hover{color:var(--ink);border-color:var(--line)}
+.opt:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.18)}
+button.cd:hover{transform:scale(1.08);z-index:1;box-shadow:0 4px 12px rgba(0,0,0,.2)}
+summary:hover{background:var(--soft)}
+.set:focus-within{box-shadow:inset 0 -2px 0 var(--ink)}
+.btn.fab{position:fixed;right:18px;bottom:76px;z-index:6;border-radius:999px;padding:14px 28px;box-shadow:0 10px 28px rgba(0,0,0,.3);animation:flota 3s ease-in-out infinite}
+.btn.fab:hover{animation-play-state:paused}
+@keyframes flota{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.top{position:fixed;left:18px;bottom:76px;z-index:6;width:46px;height:46px;border-radius:50%;border:2px solid var(--ink);background:#fff;color:var(--ink);font-size:20px;cursor:pointer;opacity:0;pointer-events:none;box-shadow:0 6px 18px rgba(0,0,0,.2)}
+.top.ver{opacity:1;pointer-events:auto}
+.top:hover{background:var(--ink);color:#fff;transform:translateY(-3px)}
+.pie2{text-align:center;color:var(--mut);font-size:12px;letter-spacing:.1em;padding:30px 0 100px}
+@keyframes entra{from{opacity:0}to{opacity:1}}
+.pg.on{animation:entra .35s}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+#reloj {
+  width: min(100%, 440px);
+  margin: 18px auto 18px;
+  padding: 22px;
+  color: #eef2d7;
+  background: linear-gradient(145deg, #1b2418 0%, #0d110d 75%);
+  border: 1px solid #303a2a;
+  border-radius: 22px;
+  box-shadow: 0 12px 30px rgba(0,0,0,.18);
+  transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+}
+#reloj:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 22px 48px rgba(0,0,0,.30), 0 0 0 1px rgba(210,224,165,.12);
+  border-color: #65734b;
+}
+.reloj-top { display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; }
+.reloj-marca { font-size:12px; font-weight:900; letter-spacing:.18em; color:#eef2d7; }
+.reloj-punto { display:inline-block; width:7px; height:7px; margin-left:8px; vertical-align:middle; border-radius:50%; background:#d6e39a; box-shadow:0 0 12px rgba(214,227,154,.6); }
+.reloj-fecha { color:#9ba58c; font-size:11px; text-transform:uppercase; letter-spacing:.08em; }
+.reloj-centro { display:flex; align-items:center; justify-content:center; gap:10px; margin:22px 0 18px; }
+.reloj-digito { flex:1; min-width:0; display:flex; flex-direction:column; align-items:center; overflow:hidden; border:1px solid #394332; border-radius:14px; padding:12px 6px 9px; background:linear-gradient(180deg,#2a3424 0%,#192017 100%); box-shadow:0 5px 0 #080b08; }
+.reloj-digito b { font-size:clamp(38px,8vw,56px); line-height:1; font-weight:900; letter-spacing:-.06em; font-variant-numeric:tabular-nums; }
+.reloj-digito span { margin-top:7px; color:#9ba58c; font-size:9px; letter-spacing:.18em; }
+.reloj-dos-puntos { font-size:30px; font-weight:900; color:#aab58c; }
+.reloj-ubicacion { font-size:10px; font-weight:700; color:#aab39c; letter-spacing:.13em; padding-bottom:16px; border-bottom:1px solid #303a2a; }
+.reloj-horario { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; padding-top:15px; font-size:11px; }
+.reloj-horario span { color:#9ba58c; letter-spacing:.08em; }
+.reloj-horario b { color:#eef2d7; font-size:12px; font-variant-numeric:tabular-nums; }
+#modal{position:fixed;inset:0;z-index:15;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;padding:16px}
+#modal.on{display:flex}
+#mbox{position:relative;width:min(100%,420px);background:#0b0d12;color:#fff;border:1px solid #2a2f3a;border-radius:18px;padding:26px 22px 22px;box-shadow:0 24px 70px rgba(0,0,0,.6);animation:pop .22s ease-out}
+@keyframes pop{from{opacity:0;transform:scale(.92) translateY(10px)}to{opacity:1;transform:none}}
+#mbox h3{font:900 36px/1 Arial,sans-serif;letter-spacing:-.03em;margin:6px 0 8px;text-transform:uppercase}
+#mbox .x{position:absolute;top:10px;right:12px;width:38px;height:38px;border-radius:50%;background:none;border:0;color:#fff;font-size:28px;line-height:1;cursor:pointer}
+#mbox .x:hover{background:#242833}
+#mbox .opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:18px 0 14px}
+#mbox .opt{padding:14px 10px;border-radius:10px}
+#mbox .opt.on{border-color:#fff;box-shadow:0 0 0 2px rgba(255,255,255,.25)}
+#mbox .opt:disabled{opacity:.55;cursor:default}
+#mbox .go{width:100%;background:#fff;color:#111;border:2px solid #fff;border-radius:10px;padding:13px;font:inherit;font-weight:700;cursor:pointer;transition:background .18s,color .18s,transform .18s}
+#mbox .go:hover{background:transparent;color:#fff;transform:translateY(-2px)}
+.cal-card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:0 18px 48px rgba(0,0,0,.18);transition:background .35s,color .35s,transform .25s,box-shadow .25s,border-color .35s}
+.cal-card:hover{background:#0b0d12;color:#fff;border-color:#0b0d12;transform:translateY(-4px);box-shadow:0 26px 60px rgba(0,0,0,.4)}
+.cal-card:hover .mut,.cal-card:hover .cdh{color:#9aa3b2}
+.cal-card:hover .btn.o{background:#fff;color:#111;border-color:#fff}
+.cal-card:hover .cd.w{background:#171a21;color:#5b6472}
+
+
+/* ===== AJUSTES RESPONSIVE PARA CELULARES ===== */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+img, svg, video, canvas {
+  max-width: 100%;
+}
+
+button, input, select, summary {
+  touch-action: manipulation;
+}
+
+@media (max-width: 600px) {
+  body {
+    font-size: 15px;
+    overflow-x: hidden;
+  }
+
+  .nav {
+    padding: 0 12px;
+    gap: 4px;
+    align-items: center;
+  }
+
+  .logo {
+    font-size: 18px;
+    padding: 10px 0 4px;
+    flex: 0 0 100%;
+  }
+
+  .nav nav {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    flex-wrap: nowrap;
+    gap: 2px;
+    scrollbar-width: thin;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .nav nav button {
+    flex: 0 0 auto;
+    white-space: nowrap;
+    padding: 12px 10px 10px;
+    font-size: 14px;
+  }
+
+  main {
+    width: 100%;
+    padding: 16px 12px 32px;
+  }
+
+  h2 {
+    font-size: clamp(24px, 7vw, 32px);
+    line-height: 1.08;
+  }
+
+  h1.fb {
+    font-size: clamp(42px, 13vw, 72px);
+    overflow-wrap: anywhere;
+  }
+
+  .pills {
+    gap: 6px;
+  }
+
+  .pill {
+    padding: 8px 12px;
+    min-height: 40px;
+  }
+
+  .stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .stats div {
+    padding: 10px 4px;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .stats b {
+    font-size: clamp(20px, 6vw, 26px);
+  }
+
+  .stats .mut {
+    font-size: 11px;
+    line-height: 1.25;
+    display: block;
+  }
+
+  summary {
+    padding: 13px 2px;
+    align-items: flex-start;
+  }
+
+  summary small {
+    overflow-wrap: anywhere;
+  }
+
+  .body {
+    padding-right: 0;
+    padding-left: 0;
+  }
+
+  .sets {
+    gap: 6px;
+  }
+
+  .set {
+    flex: 1 1 135px;
+    min-width: 0;
+    justify-content: center;
+    padding: 7px 6px;
+    gap: 5px;
+  }
+
+  input[type="number"] {
+    width: clamp(42px, 15vw, 58px);
+    min-height: 36px;
+    font-size: 16px;
+  }
+
+  .btn {
+    padding: 12px 16px;
+    min-height: 44px;
+    max-width: 100%;
+  }
+
+  .btn.fab {
+    right: 12px;
+    bottom: 70px;
+    padding: 12px 16px;
+    font-size: 13px;
+    max-width: calc(100vw - 24px);
+  }
+
+  .top {
+    left: 12px;
+    bottom: 70px;
+  }
+
+  #reloj {
+    gap: 6px 12px;
+    padding: 10px;
+  }
+
+  #hora {
+    font-size: 21px;
+    min-width: 0;
+  }
+
+  .cal-card {
+    padding: 12px 8px;
+    border-radius: 12px;
+  }
+
+  .cal {
+    gap: 2px;
+  }
+
+  .cd {
+    min-height: 42px;
+    padding: 4px 0;
+  }
+
+  .cd b {
+    font-size: 13px;
+  }
+
+  .cd span {
+    font-size: 9px;
+  }
+
+  .cdh {
+    font-size: 10px;
+  }
+
+  .legend {
+    gap: 8px;
+    font-size: 11px;
+  }
+
+  .row {
+    gap: 8px;
+  }
+
+  #mbox {
+    width: 100%;
+    max-height: 90dvh;
+    overflow-y: auto;
+    padding: 24px 16px 16px;
+  }
+
+  #mbox h3 {
+    font-size: clamp(28px, 9vw, 36px);
+  }
+
+  #mbox .opts {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  #intro {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) auto;
+    gap: 14px;
+    padding: 24px 20px 64px;
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+
+  #intro .foto {
+    width: 100%;
+    max-height: 42dvh;
+    object-fit: contain;
+  }
+
+  #intro .txt {
+    width: 100%;
+    text-align: center;
+  }
+
+  #intro h1 {
+    font-size: clamp(48px, 15vw, 82px);
+    overflow-wrap: anywhere;
+  }
+
+  #intro .lema {
+    font-size: clamp(17px, 4.8vw, 22px);
+  }
+
+  #intro p {
+    font-size: 15px;
+  }
+
+  #intro .btn {
+    padding: 14px 28px;
+    min-height: 48px;
+    margin-top: 16px;
+  }
+
+  .pie {
+    bottom: 12px;
+    font-size: 10px;
+  }
+
+  .pie2 {
+    padding: 24px 12px 120px;
+  }
+}
+
+@media (max-width: 380px) {
+  .stats b {
+    font-size: 19px;
+  }
+
+  .stats .mut {
+    font-size: 10px;
+  }
+
+  .nav nav button {
+    padding-left: 8px;
+    padding-right: 8px;
+    font-size: 13px;
+  }
+
+  .set {
+    flex-basis: 125px;
+  }
+
+  #intro {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+}
+
+
+/* Botones de respaldo: separados y adaptables */
+.backup-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 12px;
+}
+.backup-actions .btn {
+  margin: 0;
+}
+@media (max-width: 600px) {
+  .backup-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  .backup-actions .btn {
+    width: 100%;
+    max-width: 320px;
+    text-align: center;
+  }
+}
+
+
+/* Acabado profesional de la portada */
+#intro .pie {
+  left: 0;
+  right: 0;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0 16px;
+  text-align: center;
+  letter-spacing: .12em;
+  line-height: 1.5;
+}
+#intro .foto {
+  max-width: 100%;
+}
+@media (max-width: 760px) {
+  #intro .pie {
+    bottom: 12px;
+    text-align: center;
+  }
+}
+
+
+/* Botón para volver a la portada de bienvenida */
+.portada-top {
+  left: 74px;
+  width: auto;
+  min-width: 46px;
+  padding: 0 10px;
+  font-size: 21px;
+}
+.portada-top.ver {
+  opacity: 1;
+  pointer-events: auto;
+}
+@media (max-width: 600px) {
+  .portada-top {
+    left: 68px;
+    bottom: 70px;
+  }
+}
+/* El efecto de Entrar se activa al pasar el cursor; también conserva foco por teclado */
+#intro .btn:hover,
+#intro .btn:focus-visible {
+  color: #fff;
+  transform: translateY(-2px) scale(1.04);
+  animation: none;
+  box-shadow: 0 8px 30px rgba(255,255,255,.25);
+}
+#intro .btn:hover::before,
+#intro .btn:focus-visible::before {
+  transform: translateX(0);
+}
+#intro .btn:hover .ar,
+#intro .btn:focus-visible .ar {
+  transform: translateX(6px);
+}
+
+
+@media (max-width: 600px) {
+  #reloj { width: 100%; padding: 18px; margin: 24px auto 14px; }
+  .reloj-centro { gap: 7px; margin: 18px 0 16px; }
+  .reloj-digito { padding: 12px 4px 9px; }
+  .reloj-digito b { font-size: clamp(36px, 12vw, 50px); }
+  .reloj-horario { align-items:flex-start; flex-direction:column; gap:6px; }
+}
+
+</style>
+</head>
+<body>
+<div id="intro">
+  <img class="foto" src="portada.jpg" alt="">
+  <div class="txt">
+    <h1>FORJA</h1>
+    <p class="lema">La disciplina te lleva donde la motivación no llega.</p>
+    <p id="introHoy"></p>
+    <button class="btn" id="entrar">Entrar <span class="ar">→</span></button>
+  </div>
+  <div class="pie">2026 · Esteban Vellojin</div>
+</div>
+<header class="nav">
+  <span class="logo">FORJA</span>
+  <nav id="nav"><button data-s="hoy" class="on">Hoy</button><button data-s="semana">Semana</button><button data-s="calendario">Calendario</button><button data-s="progreso">Progreso</button><button data-s="historial">Historial</button></nav>
+</header>
+<div id="reloj" aria-label="Reloj local y horario de entrenamiento">
+  <div class="reloj-top">
+    <span class="reloj-marca">FORJA <span class="reloj-punto"></span></span>
+    <span class="reloj-fecha" id="fechaCo">Cargando fecha…</span>
+  </div>
+  <div class="reloj-centro">
+    <div class="reloj-digito"><b id="horaH">--</b><span>HORAS</span></div>
+    <span class="reloj-dos-puntos">:</span>
+    <div class="reloj-digito"><b id="horaM">--</b><span>MINUTOS</span></div>
+  </div>
+  <div class="reloj-ubicacion">MONTERÍA · COLOMBIA</div>
+  <div class="reloj-horario"><span>TU HORARIO</span><b>06:00 a. m. — 08:00 a. m.</b></div>
+</div>
+<main>
+  <section class="pg on" id="hoy">
+    <div id="hero"></div>
+    <div class="pills" id="pills"></div>
+    <div class="stats" id="stats"></div>
+    <div id="ejs"></div>
+    <div class="row"><span class="mut" id="msg"></span></div>
+    <button class="btn fab" id="guardar">Guardar sesión</button>
+  </section>
+
+  <section class="pg" id="semana"><h2>Tu semana</h2><p class="mut" id="hoyTxt"></p><div id="sem"></div></section>
+
+  <section class="pg" id="calendario">
+    <h2>Calendario</h2>
+    <div class="cal-card">
+    <div class="row" style="margin:0 0 12px"><button class="btn o" id="calPrev" aria-label="Mes anterior">←</button><b id="calMes"></b><button class="btn o" id="calNext" aria-label="Mes siguiente">→</button></div>
+    <div class="cal" id="calGrid"></div>
+    <div class="legend" id="calSum"></div>
+    <p class="mut">Toca un día para ver su rutina y marcarlo como pendiente, en curso, completado u omitida. Los días con una sesión guardada se marcan como completados solos.</p>
+    </div>
+  </section>
+
+  <section class="pg" id="progreso">
+    <h2>Progreso</h2>
+    <select id="selEj" aria-label="Ejercicio"></select>
+    <div id="grafica"></div>
+    <p class="mut">Carga más alta de cada sesión (kg; sin peso, repeticiones o segundos).</p>
+    <h2 style="margin-top:34px">Récords</h2><div id="recs"></div>
+  </section>
+
+  <section class="pg" id="historial">
+    <h2>Historial</h2><div id="hist"></div>
+    <h2 style="margin-top:34px">Respaldo</h2>
+    <p class="mut">Tus datos viven en este navegador. Descarga un respaldo de vez en cuando.</p>
+    <div class="backup-actions"><button class="btn o" id="exp">Descargar respaldo</button><button class="btn o" id="imp">Importar respaldo</button></div>
+    <input type="file" id="file" accept=".json" hidden>
+  </section>
+</main>
+
+<div id="modal"><div id="mbox" role="dialog" aria-modal="true"></div></div>
+<footer class="pie2">2026 · Esteban Vellojin</footer>
+<button id="arriba" class="top" aria-label="Volver arriba">↑</button>
+<button id="volverPortada" class="top portada-top" aria-label="Volver a la portada" title="Volver a la portada">⌂</button>
+
+<script>
+/* ===== TU RUTINA (edítala aquí) — ejercicio: [nombre, equipo, series, repeticiones] ===== */
+const DIAS = [
+  {n:"Lunes", l:"Gimnasio", t:"Push A", img:"lunes-push.png", c:"#60a5fa", f:"Hombros, pecho y tríceps", ej:[
+    ["Press de pecho","Máquina de press de pecho",3,"8–12"],
+    ["Press inclinado con mancuernas","Banco inclinado con respaldo",3,"8–12"],
+    ["Aperturas en máquina","Contractora (pec deck)",2,"10–15"],
+    ["Press de hombros","Máquina de press de hombros",3,"8–12"],
+    ["Elevaciones laterales","Máquina o mancuernas, sentado",3,"12–15"],
+    ["Pájaros","Máquina de aperturas inversas",2,"12–15"],
+    ["Extensión de tríceps","Polea alta con cuerda o barra",3,"10–12"],
+    ["Extensión de tríceps sobre la cabeza","Polea o mancuerna, sentado",2,"10–12"]]},
+  {n:"Martes", l:"Gimnasio", t:"Pull A", img:"martes-pull.png", c:"#4ade80", f:"Espalda, bíceps y core", ej:[
+    ["Jalón al pecho","Polea alta",3,"8–12"],
+    ["Remo sentado","Máquina de remo sentado",3,"8–12"],
+    ["Remo con pecho apoyado","Máquina con soporte de pecho",3,"8–12"],
+    ["Jalón con agarre cerrado","Polea alta, agarre neutro",3,"10–12"],
+    ["Curl de bíceps","Máquina de curl o polea baja",3,"10–12"],
+    ["Curl martillo","Mancuernas, sentado",3,"10–12"],
+    ["Curl inclinado","Mancuernas, banco inclinado",2,"10–12"],
+    ["Crunch abdominal","Máquina de abdominales",3,"12–15"],
+    ["Rotación de torso","Máquina de rotación, sentado",2,"12–15 por lado"]]},
+  {n:"Miércoles", l:"Gimnasio", t:"Push B", img:"miercoles-hombros.png", c:"#f87171", f:"Pecho y hombros", ej:[
+    ["Press de pecho con mancuernas","Banco plano",3,"8–12"],
+    ["Press inclinado en máquina","Máquina de press inclinado",3,"8–12"],
+    ["Aperturas con mancuernas","Banco plano",2,"10–15"],
+    ["Press militar","Mancuernas, sentado con respaldo",3,"8–12"],
+    ["Elevaciones laterales","Mancuernas, sentado",2,"12–15"],
+    ["Pájaros","Máquina inversa o mancuernas apoyado en banco",2,"12–15"]]},
+  {n:"Jueves", l:"Casa", t:"Pull B", img:"jueves-pull.png", c:"#facc15", f:"Espalda y core", ej:[
+    ["Remo con mancuernas inclinado","Silla y mancuernas, sentado",3,"10–15"],
+    ["Remo con barra inclinado","Barra, sentado",3,"10–15"],
+    ["Pullover con mancuerna","Mancuerna, acostado",3,"12–15"],
+    ["Superman","Colchoneta (solo brazos y pecho)",3,"10–12"],
+    ["Encogimientos de hombros","Mancuernas, sentado",2,"12–15"],
+    ["Plancha","Colchoneta",3,"20–40 s"],
+    ["Plancha lateral","Colchoneta",2,"15–30 s por lado"],
+    ["Crunch en el suelo","Colchoneta",2,"12–15"]]},
+  {n:"Viernes", l:"Gimnasio", t:"Hombros + Brazos", img:"viernes-hombros-brazos.png", c:"#c084fc", f:"Hombros, bíceps y tríceps", ej:[
+    ["Press militar","Mancuernas, sentado con respaldo",3,"8–12"],
+    ["Elevaciones laterales","Polea baja o mancuernas, sentado",3,"12–15"],
+    ["Pájaros","Máquina de aperturas inversas",3,"12–15"],
+    ["Curl de bíceps","Barra Z o polea baja, sentado",3,"10–12"],
+    ["Curl predicador","Máquina o banco predicador",3,"10–12"],
+    ["Curl martillo","Mancuernas, sentado",2,"10–12"],
+    ["Extensión de tríceps","Polea alta con cuerda",3,"10–12"],
+    ["Extensión de tríceps sobre la cabeza","Polea o mancuerna, sentado",2,"10–12"],
+    ["Fondos en máquina","Máquina de fondos, sentado",2,"10–12"]]}
+];
+
+/* ===== DATOS ===== */
+const KEY="entreno_v1", $=s=>document.querySelector(s);
+let db=JSON.parse(localStorage.getItem(KEY)||'{"ses":[]}');
+db.est=db.est||{};   // estados manuales del calendario
+const guardar=()=>localStorage.setItem(KEY,JSON.stringify(db));
+const iso=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+const hoy=iso(new Date()), dow=new Date().getDay();
+const lun=new Date(); lun.setDate(lun.getDate()-((lun.getDay()+6)%7));
+const lunIso=iso(lun), sum=d=>d.ej.reduce((a,e)=>a+e[2],0);
+let sel=dow>=1&&dow<=5?dow-1:0;
+const fmt=s=>s.map(a=>(a[0]??"–")+"×"+(a[1]??"–")).join(", ");
+
+/* ===== PESTAÑA HOY ===== */
+function pintaHoy(){
+  const d=DIAS[sel];
+  document.documentElement.style.setProperty("--ac",d.c);
+  $("#hero").innerHTML=`<img class="cover" src="${d.img}" alt="${d.t}" onerror="this.outerHTML='<h1 class=fb>'+this.alt+'</h1>'"><p class="mut" style="margin:12px 0 0">${d.n} en ${d.l.toLowerCase()}: ${d.f}, ${d.ej.length} ejercicios y ${sum(d)} series</p>`;
+  $("#pills").innerHTML=DIAS.map((x,i)=>`<button class="pill${i===sel?" on":""}${db.ses.some(s=>s.f>=lunIso&&s.d===i)?" ok":""}" data-i="${i}">${x.n.slice(0,3)}</button>`).join("");
+  const sw=db.ses.filter(s=>s.f>=lunIso);
+  $("#stats").innerHTML=`<div><b>${new Set(sw.map(s=>s.d)).size}/5</b><span class="mut">días esta semana</span></div><div><b>${sw.reduce((a,s)=>a+s.e.reduce((b,e)=>b+e.s.length,0),0)}</b><span class="mut">series esta semana</span></div><div><b>${db.ses.length}</b><span class="mut">sesiones en total</span></div>`;
+  const hs=db.ses.find(s=>s.f===hoy&&s.d===sel);
+  $("#ejs").innerHTML=d.ej.map((e,k)=>{
+    const cur=hs&&hs.e.find(x=>x.n===e[0]), u=ultimo(e[0]), seg=/ s/.test(e[3]);
+    let sets="";
+    for(let j=0;j<e[2];j++){const v=(cur&&cur.s[j])||[];
+      sets+=`<div class="set"><b>S${j+1}</b><input type="number" step="any" placeholder="kg" aria-label="kg serie ${j+1}" value="${v[0]??""}"><input type="number" placeholder="${seg?"seg":"reps"}" aria-label="repeticiones serie ${j+1}" value="${v[1]??""}"></div>`}
+    return `<details class="ex" data-n="${e[0]}"${k===0?" open":""}><summary><span class="sum">${e[0]}<small>${e[2]} × ${e[3]} · ${e[1]}</small></span>${cur?'<span class="chk">✓</span>':""}</summary><div class="body"><div class="sets">${sets}</div>${u?`<div class="mut">Última vez: ${fmt(u.s)}</div>`:""}</div></details>`}).join("");
+}
+function ultimo(n){for(let i=db.ses.length-1;i>=0;i--){if(db.ses[i].f===hoy)continue;const e=db.ses[i].e.find(x=>x.n===n);if(e)return e}return null}
+
+/* ===== PESTAÑA SEMANA ===== */
+function pintaSemana(){
+  $("#hoyTxt").textContent=new Date().toLocaleDateString("es-CO",{weekday:"long",day:"numeric",month:"long"})+". Despliega un día para ver sus ejercicios.";
+  $("#sem").innerHTML=DIAS.map((d,i)=>`<details><summary><span class="sum"><span style="border-left:5px solid ${d.c};padding-left:10px">${d.n}: ${d.t}</span><small>${d.l} · ${d.f} · ${sum(d)} series</small></span></summary><div class="body">${d.ej.map(e=>`<div class="li"><span>${e[0]}<br><span class="mut">${e[1]}</span></span><b>${e[2]} × ${e[3]}</b></div>`).join("")}<div class="row"><span></span><button class="btn o" data-go="${i}">Entrenar este día</button></div></div></details>`).join("");
+}
+
+/* ===== PESTAÑA PROGRESO ===== */
+function graf(){
+  const n=$("#selEj").value, pts=[];
+  db.ses.forEach(s=>{const e=s.e.find(x=>x.n===n);if(!e)return;const kg=Math.max(...e.s.map(a=>a[0]||0)),r=Math.max(...e.s.map(a=>a[1]||0));pts.push([s.f,kg||r])});
+  if(!pts.length){$("#grafica").innerHTML='<p class="mut">Todavía no hay registros de este ejercicio. Guarda una sesión y aparecerá aquí.</p>';return}
+  const W=640,H=210,p=34,mx=Math.max(...pts.map(a=>a[1]))*1.2||1,X=i=>pts.length<2?W/2:p+i*(W-2*p)/(pts.length-1),Y=v=>H-p-(v/mx)*(H-2*p);
+  $("#grafica").innerHTML=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Progreso"><line x1="${p}" y1="${H-p}" x2="${W-p}" y2="${H-p}" stroke="#cfd3d8"/><polyline fill="none" stroke="#111" stroke-width="2.5" points="${pts.map((a,i)=>X(i)+","+Y(a[1])).join(" ")}"/>${pts.map((a,i)=>`<circle cx="${X(i)}" cy="${Y(a[1])}" r="5" fill="#111"/><text x="${X(i)}" y="${Y(a[1])-11}" font-size="12" font-weight="700" text-anchor="middle">${a[1]}</text><text x="${X(i)}" y="${H-10}" fill="#6b7280" font-size="11" text-anchor="middle">${a[0].slice(5)}</text>`).join("")}</svg>`;
+}
+function records(){
+  const m={};
+  db.ses.forEach(s=>s.e.forEach(e=>{const kg=Math.max(...e.s.map(a=>a[0]||0));if(kg>0&&(!m[e.n]||kg>=m[e.n][0]))m[e.n]=[kg,s.f]}));
+  const k=Object.keys(m);
+  $("#recs").innerHTML=k.length?k.map(n=>`<div class="li"><span>${n}<br><span class="mut">${m[n][1]}</span></span><b>${m[n][0]} kg</b></div>`).join(""):'<p class="mut">Tus récords de peso aparecerán aquí.</p>';
+}
+
+/* ===== PESTAÑA HISTORIAL ===== */
+function pintaHist(){
+  $("#hist").innerHTML=db.ses.slice().reverse().map(s=>{const d=DIAS[s.d];
+    return `<details><summary><span class="sum">${s.f}: ${d.t}<small>${s.e.length} ejercicios registrados</small></span></summary><div class="body">${s.e.map(e=>`<div class="li"><span>${e.n}</span><span>${fmt(e.s)}</span></div>`).join("")}<div class="row"><span></span><button class="btn o" data-del="${s.f}|${s.d}">Borrar sesión</button></div></div></details>`}).join("")||'<p class="mut">Aún no hay sesiones. Cuando guardes la primera, aparecerá aquí.</p>';
+}
+/* ===== PESTAÑA CALENDARIO (oct 2026 a dic 2027) ===== */
+const EST=[["pendiente","Pendiente"],["curso","En curso"],["completado","Completado"],["omitida","Omitida"]];
+const MESES=["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+let cs=null;   // día seleccionado en el calendario
+let cm=new Date(new Date().getFullYear(),new Date().getMonth(),1); if(cm<new Date(2026,9,1))cm=new Date(2026,9,1);
+const est=f=>db.ses.some(s=>s.f===f)?"completado":(db.est[f]||"pendiente");
+function pintaCal(){
+  const y=cm.getFullYear(),m=cm.getMonth(),n=new Date(y,m+1,0).getDate(),off=(new Date(y,m,1).getDay()+6)%7,cnt={pendiente:0,curso:0,completado:0,omitida:0};
+  let h=["Lun","Mar","Mié","Jue","Vie","Sáb","Dom"].map(x=>`<div class="mut cdh">${x}</div>`).join("");
+  for(let i=0;i<off;i++)h+="<div></div>";
+  for(let d=1;d<=n;d++){
+    const dt=new Date(y,m,d),f=iso(dt),w=dt.getDay(),tod=f===hoy?" hoyc":"";
+    if(w>=1&&w<=5&&f>="2026-10-21"){const e=est(f);cnt[e]++;h+=`<button class="cd s-${e}${tod}${f===cs?" sel":""}" data-d="${f}" aria-label="${f}: ${e}"><b>${d}</b></button>`}
+    else h+=`<div class="cd w${tod}"><b>${d}</b></div>`;
+  }
+  $("#calGrid").innerHTML=h;
+  $("#calMes").textContent=MESES[m]+" "+y;
+  $("#calSum").innerHTML=EST.map(([k,l])=>`<span><i class="s-${k}"></i>${l}: ${cnt[k]}</span>`).join("");
+  $("#calPrev").disabled=y===2026&&m===9;$("#calNext").disabled=y===2027&&m===11;
+  pintaDet();
+}
+function pintaDet(){
+  const m=$("#modal");
+  if(!cs){m.classList.remove("on");return}
+  const dt=new Date(cs+"T12:00:00"),w=dt.getDay(),d=DIAS[w-1],e=est(cs),lock=db.ses.some(x=>x.f===cs);
+  $("#mbox").innerHTML=`<button class="x" data-x aria-label="Cerrar">×</button><p class="mut2">${dt.toLocaleDateString("es-CO",{weekday:"long",day:"numeric",month:"long",year:"numeric"})}</p><h3>${d.t}</h3><p class="mut2">${d.l} · ${d.f} · ${d.ej.length} ejercicios · ${sum(d)} series</p><div class="opts">${EST.map(([k,l])=>`<button class="opt s-${k}${e===k?" on":""}" data-st="${k}"${lock?" disabled":""}>${l}</button>`).join("")}</div>${lock?'<p class="mut2" style="margin:0 0 12px">Tiene una sesión guardada, por eso está completado.</p>':""}<button class="go" data-go2="${w-1}">Ir a esta rutina →</button>`;
+  m.classList.add("on");
+}
+function todo(){pintaHoy();pintaSemana();pintaCal();graf();records();pintaHist()}
+
+/* ===== ACCIONES ===== */
+$("#nav").onclick=e=>{const b=e.target.closest("button");if(!b)return;
+  document.querySelectorAll(".pg").forEach(s=>s.classList.toggle("on",s.id===b.dataset.s));
+  document.querySelectorAll("#nav button").forEach(x=>x.classList.toggle("on",x===b));scrollTo(0,0)};
+$("#pills").onclick=e=>{const b=e.target.closest(".pill");if(b){sel=+b.dataset.i;$("#msg").textContent="";pintaHoy()}};
+$("#sem").onclick=e=>{const b=e.target.closest("[data-go]");if(!b)return;sel=+b.dataset.go;pintaHoy();$("#nav button").click()};
+$("#selEj").onchange=graf;
+$("#guardar").onclick=()=>{
+  const e=[...document.querySelectorAll(".ex")].map(c=>({n:c.dataset.n,s:[...c.querySelectorAll(".set")].map(s=>[...s.querySelectorAll("input")].map(i=>i.value===""?null:+i.value)).filter(a=>a[0]!==null||a[1]!==null)})).filter(x=>x.s.length);
+  if(!e.length){$("#msg").textContent="Anota al menos una serie para guardar.";return}
+  db.ses=db.ses.filter(s=>!(s.f===hoy&&s.d===sel));db.ses.push({f:hoy,d:sel,e});db.ses.sort((a,b)=>a.f<b.f?-1:1);
+  guardar();todo();$("#msg").textContent="Sesión guardada.";
+  const g=$("#guardar");g.textContent="✓ Guardada";setTimeout(()=>g.textContent="Guardar sesión",1800);
+};
+$("#hist").onclick=e=>{const b=e.target.closest("[data-del]");if(!b||!confirm("¿Borrar esta sesión?"))return;
+  const[f,d]=b.dataset.del.split("|");db.ses=db.ses.filter(s=>!(s.f===f&&s.d===+d));guardar();todo()};
+$("#exp").onclick=()=>{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(db)],{type:"application/json"}));a.download="respaldo-entreno-"+hoy+".json";a.click()};
+$("#imp").onclick=()=>$("#file").click();
+$("#file").onchange=e=>{const f=e.target.files[0];if(!f)return;f.text().then(x=>{try{const j=JSON.parse(x);if(!Array.isArray(j.ses))throw 0;db=j;db.est=db.est||{};guardar();todo()}catch{alert("El archivo no es un respaldo válido.")}})};
+
+$("#calPrev").onclick=()=>{cs=null;cm=new Date(cm.getFullYear(),cm.getMonth()-1,1);pintaCal()};
+$("#calNext").onclick=()=>{cs=null;cm=new Date(cm.getFullYear(),cm.getMonth()+1,1);pintaCal()};
+$("#calGrid").onclick=e=>{const b=e.target.closest("[data-d]");if(!b)return;cs=b.dataset.d;pintaCal()};
+$("#modal").onclick=e=>{
+  if(e.target.id==="modal"||e.target.closest("[data-x]")){cs=null;pintaCal();return}
+  const b=e.target.closest("[data-st]");
+  if(b&&cs){if(b.dataset.st==="pendiente")delete db.est[cs];else db.est[cs]=b.dataset.st;guardar();pintaCal();return}
+  const g=e.target.closest("[data-go2]");
+  if(g){sel=+g.dataset.go2;cs=null;pintaCal();pintaHoy();$("#nav button").click()}
+};
+addEventListener("keydown",e=>{if(e.key==="Escape"&&cs){cs=null;pintaCal()}});
+$("#entrar").focus({preventScroll:true});
+$("#entrar").onclick=()=>{$("#intro").classList.add("out");setTimeout(()=>$("#intro")&&$("#intro").remove(),700)};
+$("#volverPortada").onclick=()=>{
+  const intro=$("#intro");
+  if(!intro){
+    location.reload();
+    return;
+  }
+  intro.classList.remove("out");
+  intro.style.opacity="1";
+  intro.style.transform="none";
+  intro.style.pointerEvents="auto";
+  intro.style.display="grid";
+  $("#entrar").focus({preventScroll:true});
+};
+
+$("#introHoy").textContent=dow>=1&&dow<=5?"Hoy toca: "+DIAS[sel].t+" · "+DIAS[sel].l:"";
+
+/* Botón flotante para volver arriba */
+addEventListener("scroll",()=>{const show=scrollY>400;$("#arriba").classList.toggle("ver",show);$("#volverPortada").classList.toggle("ver",show)});
+$("#arriba").onclick=()=>scrollTo({top:0,behavior:"smooth"});
+
+/* Reloj de Colombia */
+const fh=new Intl.DateTimeFormat("es-CO",{timeZone:"America/Bogota",hour:"numeric",minute:"2-digit",hour12:true});
+const ff=new Intl.DateTimeFormat("es-CO",{timeZone:"America/Bogota",weekday:"long",day:"numeric",month:"short"});
+const tick=()=>{
+  const now = new Date();
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone:"America/Bogota", hour:"2-digit", minute:"2-digit", hour12:true
+  }).formatToParts(now);
+  const hour = parts.find(p => p.type === "hour")?.value || "--";
+  const minute = parts.find(p => p.type === "minute")?.value || "--";
+  const period = parts.find(p => p.type === "dayPeriod")?.value || "";
+  const h = document.getElementById("horaH");
+  const m = document.getElementById("horaM");
+  const d = document.getElementById("fechaCo");
+  if (h) h.textContent = hour;
+  if (m) m.textContent = minute;
+  if (d) d.textContent = ff.format(now).replace(/^./, c => c.toUpperCase());
+  const clock = document.getElementById("reloj");
+  if (clock) clock.setAttribute("aria-label", "Hora de Montería: " + fh.format(now) + " " + period);
+};
+tick();
+setInterval(tick, 1000);
+
+$("#selEj").innerHTML=[...new Set(DIAS.flatMap(d=>d.ej.map(e=>e[0])))].map(n=>`<option>${n}</option>`).join("");
+todo();
+</script>
+</body>
+</html>
