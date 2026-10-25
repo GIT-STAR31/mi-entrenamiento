@@ -580,6 +580,33 @@ button, input, select, summary {
   }
 }
 
+
+/* ===== EFECTOS DEL BOTÓN CERRAR SESIÓN ===== */
+#cerrarSesion {
+  transition: background .25s ease,
+              color .25s ease,
+              transform .25s ease,
+              box-shadow .25s ease,
+              border-color .25s ease;
+}
+
+#cerrarSesion:hover {
+  background: #60a5fa !important;
+  color: #080b12 !important;
+  border-color: #60a5fa !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(96, 165, 250, .3);
+}
+
+#cerrarSesion:active {
+  transform: scale(.96);
+}
+
+#cerrarSesion:focus-visible {
+  outline: 2px solid #60a5fa;
+  outline-offset: 3px;
+}
+
 </style>
 </head>
 <body>
@@ -601,7 +628,7 @@ button, input, select, summary {
   </form>
 </div>
 
-<button id="cerrarSesion" type="button" style="position:fixed;top:16px;right:16px;z-index:9998;padding:10px 14px;background:#111827;color:white;border:1px solid #39465d;border-radius:10px;cursor:pointer;display:block">
+<button id="cerrarSesion" type="button" style="display:none; position:relative; top:auto; right:auto; z-index:1; width:auto; margin:10px 20px 10px auto; padding:8px 14px; background:#111827; color:white; border:1px solid #39465d; border-radius:10px; cursor:pointer">
   Cerrar sesión
 </button>
 
