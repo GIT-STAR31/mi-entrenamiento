@@ -566,6 +566,24 @@ button, input, select, summary {
 </style>
 </head>
 <body>
+
+<div id="loginScreen" style="position:fixed;inset:0;z-index:9999;background:#080b12;color:white;display:flex;align-items:center;justify-content:center;padding:24px;font-family:Arial,sans-serif">
+  <form id="loginForm" style="width:100%;max-width:380px;background:#111827;padding:28px;border-radius:18px;border:1px solid #293449">
+    <h1 style="margin-top:0">FORJA</h1>
+    <p>Inicia sesión para entrar a tu entrenamiento.</p>
+
+    <label for="loginEmail">Correo electrónico</label>
+    <input id="loginEmail" type="email" autocomplete="username" required style="box-sizing:border-box;width:100%;padding:12px;margin:8px 0 18px;background:#080b12;color:white;border:1px solid #39465d;border-radius:8px">
+
+    <label for="loginPassword">Contraseña</label>
+    <input id="loginPassword" type="password" autocomplete="current-password" required style="box-sizing:border-box;width:100%;padding:12px;margin:8px 0 18px;background:#080b12;color:white;border:1px solid #39465d;border-radius:8px">
+
+    <button id="loginSubmit" type="submit" style="width:100%;padding:12px;background:#60a5fa;color:#080b12;border:0;border-radius:8px;font-weight:bold;cursor:pointer">Iniciar sesión</button>
+
+    <p id="loginMsg" role="status"></p>
+  </form>
+</div>
+
 <div id="intro">
   <img class="foto" src="portada.jpg" alt="">
   <div class="txt">
@@ -647,7 +665,17 @@ button, input, select, summary {
 <button id="arriba" class="top" aria-label="Volver arriba">↑</button>
 <button id="volverPortada" class="top portada-top" aria-label="Volver a la portada" title="Volver a la portada">⌂</button>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+  /* ===== CONEXIÓN SUPABASE ===== */
+const SUPABASE_URL = "https://qqoshultcmzxdpkdxgiy.supabase.co";
+const SUPABASE_KEY = "sb_publishable_KYuIz93VGgLAmX3bgzcclg_lu1Kh_Lo";
+
+const sb = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+
 /* ===== TU RUTINA (edítala aquí) — ejercicio: [nombre, equipo, series, repeticiones] ===== */
 const DIAS = [
   {n:"Lunes", l:"Gimnasio", t:"Push A", img:"lunes-push.png", c:"#60a5fa", f:"Hombros, pecho y tríceps", ej:[
@@ -697,11 +725,38 @@ const DIAS = [
     ["Fondos en máquina","Máquina de fondos, sentado",2,"10–12"]]}
 ];
 
-/* ===== DATOS ===== */
-const KEY="entreno_v1", $=s=>document.querySelector(s);
-let db=JSON.parse(localStorage.getItem(KEY)||'{"ses":[]}');
-db.est=db.est||{};   // estados manuales del calendario
-const guardar=()=>localStorage.setItem(KEY,JSON.stringify(db));
+/* ===== DATOS Y NUBE ===== */
+const KEY = "entreno_v1";
+const $ = s => document.querySelector(s);
+
+let db = { ses: [], est: {} };
+let currentUser = null;
+let datosListos = false;
+
+function guardar() {
+  db.est = db.est || {};
+  localStorage.setItem(KEY, JSON.stringify(db));
+
+  if (currentUser && datosListos) {
+    guardarEnNube();
+  }
+}
+
+async function guardarEnNube() {
+  if (!currentUser || !datosListos) return;
+
+  const { error } = await sb
+    .from("entreno")
+    .upsert({
+      user_id: currentUser.id,
+      datos: db,
+      updated_at: new Date().toISOString()
+    }, { onConflict: "user_id" });
+
+  if (error) {
+    console.error("Error al guardar en Supabase:", error.message);
+  }
+}
 const iso=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
 const hoy=iso(new Date()), dow=new Date().getDay();
 const lun=new Date(); lun.setDate(lun.getDate()-((lun.getDay()+6)%7));
@@ -882,7 +937,89 @@ $("#ddQ").onkeydown=e=>{const o=[...document.querySelectorAll("#ddList [data-n]"
   else if(e.key==="ArrowDown"||e.key==="ArrowUp"){e.preventDefault();ddAct=Math.max(0,Math.min(o.length-1,ddAct+(e.key==="ArrowDown"?1:-1)));o.forEach((x,i)=>x.classList.toggle("act",i===ddAct));o[ddAct]&&o[ddAct].scrollIntoView({block:"nearest"})}
   else if(e.key==="Enter"){e.preventDefault();const t=o[ddAct>=0?ddAct:0];t&&ddElige(t.dataset.n)}};
 $("#ddVal").textContent=$("#selEj").value;
-todo();
+
+/* ===== INICIO DE SESIÓN FORJA ===== */
+
+async function iniciarFORJA() {
+  const pantalla = $("#loginScreen");
+  const mensaje = $("#loginMsg");
+  const formulario = $("#loginForm");
+  const boton = $("#loginSubmit");
+
+  formulario.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    boton.disabled = true;
+    mensaje.textContent = "Iniciando sesión...";
+
+    const email = $("#loginEmail").value.trim();
+    const password = $("#loginPassword").value;
+
+    const { data, error } = await sb.auth.signInWithPassword({
+      email,
+      password
+    });
+
+    if (error) {
+      mensaje.textContent = "No se pudo iniciar sesión. Revisa tu correo y contraseña.";
+      boton.disabled = false;
+      return;
+    }
+
+    currentUser = data.user;
+    await cargarDatosUsuario();
+    pantalla.style.display = "none";
+  });
+
+  const { data } = await sb.auth.getSession();
+
+  if (data.session) {
+    currentUser = data.session.user;
+    await cargarDatosUsuario();
+    pantalla.style.display = "none";
+  }
+}
+
+async function cargarDatosUsuario() {
+  datosListos = false;
+
+  const { data, error } = await sb
+    .from("entreno")
+    .select("datos")
+    .eq("user_id", currentUser.id)
+    .maybeSingle();
+
+  if (error) {
+    $("#loginMsg").textContent = "Error al cargar tus datos. Recarga la página e inténtalo de nuevo.";
+    console.error(error);
+    return;
+  }
+
+  if (data && data.datos) {
+    db = data.datos;
+  } else {
+    const guardado = localStorage.getItem(KEY);
+
+    if (guardado) {
+      try {
+        db = JSON.parse(guardado);
+      } catch {
+        db = { ses: [], est: {} };
+      }
+    }
+
+    db.ses = db.ses || [];
+    db.est = db.est || {};
+
+    await guardarEnNube();
+  }
+
+  datosListos = true;
+  localStorage.setItem(KEY, JSON.stringify(db));
+  todo();
+}
+
+iniciarFORJA();
+
 </script>
 </body>
 </html>
