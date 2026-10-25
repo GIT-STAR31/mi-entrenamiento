@@ -584,15 +584,9 @@ button, input, select, summary {
   </form>
 </div>
 
-  </form>
-</div>
-
 <button id="cerrarSesion" type="button" style="position:fixed;top:16px;right:16px;z-index:9998;padding:10px 14px;background:#111827;color:white;border:1px solid #39465d;border-radius:10px;cursor:pointer;display:block">
   Cerrar sesión
 </button>
-
-<div id="intro">
-  <img class="foto" src="portada.jpg" alt="">
 
 <div id="intro">
   <img class="foto" src="portada.jpg" alt="">
@@ -975,23 +969,37 @@ async function iniciarFORJA() {
       return;
     }
 
-   
-currentUser = data.user;
+    currentUser = data.user;
     await cargarDatosUsuario();
-    pantalla.style.display = "none";
-    $("#cerrarSesion").style.display = "block";
+
+    if (datosListos) {
+      pantalla.style.display = "none";
+      $("#cerrarSesion").style.display = "block";
+      $("#intro")?.remove();
+    }
+
+    boton.disabled = false;
   });
 
-  const { data } = await sb.auth.getSession();
+  const { data, error } = await sb.auth.getSession();
+
+  if (error) {
+    mensaje.textContent = "No se pudo comprobar la sesión. Recarga la página.";
+    console.error(error);
+    return;
+  }
 
   if (data.session) {
     currentUser = data.session.user;
     await cargarDatosUsuario();
-    pantalla.style.display = "none";
-    $("#cerrarSesion").style.display = "block";
+
+    if (datosListos) {
+      pantalla.style.display = "none";
+      $("#cerrarSesion").style.display = "block";
+      $("#intro")?.remove();
+    }
   }
 }
-
 
 async function cargarDatosUsuario() {
   datosListos = false;
@@ -1003,7 +1011,8 @@ async function cargarDatosUsuario() {
     .maybeSingle();
 
   if (error) {
-    $("#loginMsg").textContent = "Error al cargar tus datos. Recarga la página e inténtalo de nuevo.";
+    $("#loginMsg").textContent =
+      "Error al cargar tus datos. Recarga la página e inténtalo de nuevo.";
     console.error(error);
     return;
   }
@@ -1023,18 +1032,21 @@ async function cargarDatosUsuario() {
 
     db.ses = db.ses || [];
     db.est = db.est || {};
-
-    await guardarEnNube();
   }
 
   datosListos = true;
   localStorage.setItem(KEY, JSON.stringify(db));
   todo();
+
+  if (!data || !data.datos) {
+    await guardarEnNube();
+  }
 }
 
 iniciarFORJA();
 
 /* ===== CERRAR SESIÓN ===== */
+
 const btnCerrar = $("#cerrarSesion");
 
 btnCerrar.addEventListener("click", async () => {
@@ -1055,6 +1067,8 @@ btnCerrar.addEventListener("click", async () => {
   $("#loginForm").reset();
   $("#loginMsg").textContent = "";
   $("#loginScreen").style.display = "flex";
+  $("#intro")?.remove();
+
   btnCerrar.style.display = "none";
   btnCerrar.disabled = false;
   btnCerrar.textContent = "Cerrar sesión";
