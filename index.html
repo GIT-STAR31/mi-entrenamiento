@@ -584,6 +584,16 @@ button, input, select, summary {
   </form>
 </div>
 
+  </form>
+</div>
+
+<button id="cerrarSesion" type="button" style="position:fixed;top:16px;right:16px;z-index:9998;padding:10px 14px;background:#111827;color:white;border:1px solid #39465d;border-radius:10px;cursor:pointer;display:block">
+  Cerrar sesión
+</button>
+
+<div id="intro">
+  <img class="foto" src="portada.jpg" alt="">
+
 <div id="intro">
   <img class="foto" src="portada.jpg" alt="">
   <div class="txt">
@@ -965,9 +975,11 @@ async function iniciarFORJA() {
       return;
     }
 
-    currentUser = data.user;
+   
+currentUser = data.user;
     await cargarDatosUsuario();
     pantalla.style.display = "none";
+    $("#cerrarSesion").style.display = "block";
   });
 
   const { data } = await sb.auth.getSession();
@@ -976,8 +988,10 @@ async function iniciarFORJA() {
     currentUser = data.session.user;
     await cargarDatosUsuario();
     pantalla.style.display = "none";
+    $("#cerrarSesion").style.display = "block";
   }
 }
+
 
 async function cargarDatosUsuario() {
   datosListos = false;
@@ -1019,6 +1033,32 @@ async function cargarDatosUsuario() {
 }
 
 iniciarFORJA();
+
+/* ===== CERRAR SESIÓN ===== */
+const btnCerrar = $("#cerrarSesion");
+
+btnCerrar.addEventListener("click", async () => {
+  btnCerrar.disabled = true;
+  btnCerrar.textContent = "Cerrando sesión...";
+
+  const { error } = await sb.auth.signOut();
+
+  if (error) {
+    alert("No se pudo cerrar la sesión. Inténtalo de nuevo.");
+    btnCerrar.disabled = false;
+    btnCerrar.textContent = "Cerrar sesión";
+    return;
+  }
+
+  currentUser = null;
+  datosListos = false;
+  $("#loginForm").reset();
+  $("#loginMsg").textContent = "";
+  $("#loginScreen").style.display = "flex";
+  btnCerrar.style.display = "none";
+  btnCerrar.disabled = false;
+  btnCerrar.textContent = "Cerrar sesión";
+});
 
 </script>
 </body>
